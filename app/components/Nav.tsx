@@ -1,9 +1,15 @@
+"use client";
+
+import dynamic from "next/dynamic";
+
 const sections = [
   { id: "home", label: "Home", icon: "🏠" },
   { id: "wishes", label: "Wishes", icon: "🎂" },
   { id: "games", label: "Games", icon: "🎮" },
   { id: "movies", label: "Movies", icon: "🎬" },
 ];
+
+const LoginButton = dynamic(() => import("./LoginButton"), { ssr: false });
 
 export default function Nav() {
   return (
@@ -25,6 +31,9 @@ export default function Nav() {
               </a>
             </li>
           ))}
+          <li>
+            <LoginButton />
+          </li>
         </ul>
       </div>
     </nav>

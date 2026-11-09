@@ -1,6 +1,7 @@
 "use client";
 
-import React, { createContext, useContext, useState, useEffect, useCallback } from "react";
+import { SessionProvider, useSession as useNextAuthSession, signIn, signOut } from "next-auth/react";
+import React, { createContext, useContext, useCallback } from "react";
 
 interface User {
   name?: string | null;
@@ -22,55 +23,35 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [session, setSession] = useState<Session | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+/**
+ * Internal provider that wraps next-auth's SessionProvider
+ * and exposes a simplified auth context to consumers.
+ */
+function AuthContextProvider({ children }: { children: React.ReactNode }) {
+  const { data: session, status } = useNextAuthSession();
+  const isLoading = status === "loading";
 
-  const fetchSession = useCallback(async () => {
-    try {
-      const response = await fetch("/api/auth/session");
-      if (response.ok) {
-        const data = await response.json();
-        setSession(data);
-      } else {
-        setSession(null);
-      }
-    } catch (error) {
-      console.error("Failed to fetch session:", error);
-      setSession(null);
-    } finally {
-      setIsLoading(false);
-    }
+  const handleSignIn = useCallback(() => {
+    signIn("google");
   }, []);
 
-  useEffect(() => {
-    fetchSession();
-  }, [fetchSession]);
-
-  const signIn = async () => {
-    setIsLoading(true);
-    window.location.href = "/api/auth/signin/google";
-  };
-
-  const signOut = async () => {
-    setIsLoading(true);
-    try {
-      await fetch("/api/auth/signout", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-      await fetchSession();
-    } catch (error) {
-      console.error("Failed to sign out:", error);
-    }
-  };
+  const handleSignOut = useCallback(() => {
+    signOut();
+  }, []);
 
   return (
-    <AuthContext.Provider value={{ session, isLoading, signIn, signOut }}>
+    <AuthContext.Provider value={{ session: session ?? null, isLoading, signIn: handleSignIn, signOut: handleSignOut }}>
       {children}
     </AuthContext.Provider>
+  );
+}
+
+export function AuthProvider({ children }: { children: React.ReactNode }) {
+  return (
+    <SessionProvider refetchOnWindowFocus={false}
+                     refetchInterval={0}>
+      <AuthContextProvider>{children}</AuthContextProvider>
+    </SessionProvider>
   );
 }
 

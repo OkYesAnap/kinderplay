@@ -62,7 +62,7 @@ export default function Home() {
       ))}
       {/* Footer */}
       <footer className="bg-gray-900 text-gray-400 text-center py-8 text-sm snap-start">
-        <p>&copy; {new Date().getFullYear()} KinderPlay. All rights reserved.</p>
+        <p>&copy; 2026 KinderPlay. All rights reserved.</p>
       </footer>
     </main>
   );
