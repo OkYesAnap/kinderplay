@@ -27,7 +27,6 @@ export default function Nav() {
               >
                 <span>{s.icon}</span>
                 <span>{s.label}</span>
-                <span className="text-xs opacity-70">Explore</span>
               </a>
             </li>
           ))}
