@@ -13,7 +13,11 @@ function getInitials(name: string): string {
 export default function LoginButton() {
   const { session, signIn, signOut } = useAuth();
   const user = session?.user;
-  const displayName = user?.name ?? "User";
+  // Derive display name from user_metadata (full_name or name) or fall back to email
+  const displayName = (user?.user_metadata?.full_name as string)
+    ?? (user?.user_metadata?.name as string)
+    ?? user?.email
+    ?? "User";
 
   const handleClick = () => {
     if (user) {
