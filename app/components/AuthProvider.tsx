@@ -2,6 +2,8 @@
 
 import { createSupabaseClient } from "@/lib/supabase/client";
 import React, { useCallback, useEffect, useState } from "react";
+import Popup from "./Popup";
+import { registerUser } from "../utils/registerUser";
 
 type AuthContextType = {
   session: { user: { id: string; email: string; user_metadata: Record<string, unknown> } } | null;
@@ -20,6 +22,9 @@ const AuthContext = React.createContext<AuthContextType>({
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [session, setSession] = useState<AuthContextType["session"]>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [popupVisible, setPopupVisible] = useState(false);
+  const [popupMessage, setPopupMessage] = useState("");
+  const [popupType, setPopupType] = useState<"success" | "error">("success");
 
   const supabase = React.useMemo(() => createSupabaseClient(), []);
 
@@ -31,11 +36,30 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setIsLoading(false);
     });
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      const mappedSession = session
         ? { user: { id: session.user.id, email: session.user.email ?? "", user_metadata: session.user.user_metadata } }
-        : null);
+        : null;
+      setSession(mappedSession);
       setIsLoading(false);
+
+      if (event === "SIGNED_IN" && session) {
+        try {
+          const result = await registerUser(supabase, session.user);
+          if (result.success) {
+            setPopupMessage(result.message);
+            setPopupType("success");
+          } else {
+            setPopupMessage(result.message);
+            setPopupType("error");
+          }
+          setPopupVisible(true);
+        } catch {
+          setPopupMessage("An unexpected error occurred during registration");
+          setPopupType("error");
+          setPopupVisible(true);
+        }
+      }
     });
 
     return () => {
@@ -59,6 +83,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   return (
     <AuthContext.Provider value={{ session, isLoading, signIn: handleSignIn, signOut: handleSignOut }}>
       {children}
+      <Popup
+        visible={popupVisible}
+        message={popupMessage}
+        type={popupType}
+        onClose={() => setPopupVisible(false)}
+      />
     </AuthContext.Provider>
   );
 }

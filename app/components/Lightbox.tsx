@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import Image from "next/image";
 
 interface LightboxProps {
   image: string;
@@ -44,10 +45,12 @@ export default function Lightbox({ image, onClose }: LightboxProps) {
         </button>
 
         {/* Image */}
-        <img
+        <Image
           src={image}
           alt=""
+          fill
           className="w-full h-[90vh] object-contain rounded-2xl shadow-2xl"
+          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
         />
       </div>
     </div>

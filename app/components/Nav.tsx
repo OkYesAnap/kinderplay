@@ -11,7 +11,7 @@ const sections = [
 ];
 
 export default function Nav() {
-  const { session } = useAuth();
+  useAuth();
   return (
     <nav className="fixed top-0 left-0 z-50 w-full bg-transparent backdrop-blur-xl border-b border-white/20">
       <div className="max-w-6xl mx-auto flex items-center justify-between px-6 h-16">
