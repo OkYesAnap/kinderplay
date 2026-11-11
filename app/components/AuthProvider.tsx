@@ -46,14 +46,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (event === "SIGNED_IN" && session) {
         try {
           const result = await registerUser(supabase, session.user);
-          if (result.success) {
-            setPopupMessage(result.message);
+          if (result.isNew) {
+            // Only show welcome popup for brand-new users
+            setPopupMessage(result.message ?? "");
             setPopupType("success");
-          } else {
-            setPopupMessage(result.message);
+            setPopupVisible(true);
+          } else if (!result.success) {
+            // Show error popup on failure
+            setPopupMessage(result.message ?? "");
             setPopupType("error");
+            setPopupVisible(true);
           }
-          setPopupVisible(true);
+          // If user already exists (success but not isNew), show nothing
         } catch {
           setPopupMessage("An unexpected error occurred during registration");
           setPopupType("error");
