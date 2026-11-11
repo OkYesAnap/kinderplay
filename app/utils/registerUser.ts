@@ -32,6 +32,11 @@ export async function registerUser(
       });
 
     if (error) {
+      // If the insert failed due to a duplicate key, the user already exists
+      // (race condition: another request inserted them between our check and insert)
+      if (error.code === "23505") {
+        return { success: true, isNew: false };
+      }
       console.error("Failed to register user:", error);
       return { success: false, message: "Failed to save user profile. Please try again.", isNew: false };
     }
