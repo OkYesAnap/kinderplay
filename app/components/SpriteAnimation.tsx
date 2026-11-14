@@ -38,10 +38,12 @@ export default function SpriteAnimation({
   const animationRef = useRef<number>(0);
   const frameRef = useRef<number>(0);
   const lastTimeRef = useRef<number>(0);
+  const stoppedRef = useRef(false);
 
   const [isLoaded, setIsLoaded] = useState(false);
   const [isError, setIsError] = useState(false);
   const [isPlaying, setIsPlaying] = useState(autoPlay);
+  const [isStopped, setIsStopped] = useState(false);
   const [direction, setDirection] = useState<Direction>("forward");
 
   const totalFrames = cols * rows;
@@ -80,10 +82,13 @@ export default function SpriteAnimation({
     [cols, rows]
   );
 
-  const animate = useCallback(
+  const animateStep = useCallback(
     (timestamp: number) => {
       if (lastTimeRef.current === 0) {
         lastTimeRef.current = timestamp;
+        // Schedule next frame immediately for the first call
+        animationRef.current = requestAnimationFrame(animateStep);
+        return;
       }
 
       const elapsed = timestamp - lastTimeRef.current;
@@ -92,25 +97,39 @@ export default function SpriteAnimation({
         lastTimeRef.current = timestamp;
 
         if (direction === "forward") {
-          frameRef.current = (frameRef.current + 1) % totalFrames;
+          if (frameRef.current >= totalFrames - 1) {
+            // Reached last frame — mark stopped, don't request next frame
+            stoppedRef.current = true;
+            return;
+          }
+          frameRef.current += 1;
         } else {
-          frameRef.current =
-            (frameRef.current - 1 + totalFrames) % totalFrames;
+          if (frameRef.current <= 0) {
+            // Reached first frame — mark stopped, don't request next frame
+            stoppedRef.current = true;
+            return;
+          }
+          frameRef.current -= 1;
         }
 
         drawFrame(frameRef.current);
       }
 
-      animationRef.current = requestAnimationFrame(animate);
+      animationRef.current = requestAnimationFrame(animateStep);
     },
     [direction, totalFrames, frameDuration, drawFrame]
   );
 
-  // Start / stop animation
+  // Start / stop animation + sync stopped state to UI
   useEffect(() => {
     if (isPlaying && isLoaded) {
       lastTimeRef.current = 0;
-      animationRef.current = requestAnimationFrame(animate);
+      stoppedRef.current = false;
+      animationRef.current = requestAnimationFrame(animateStep);
+    } else if (stoppedRef.current) {
+      // Animation reached its natural end — update UI state once
+      setIsPlaying(false);
+      setIsStopped(true);
     }
 
     return () => {
@@ -118,7 +137,7 @@ export default function SpriteAnimation({
         cancelAnimationFrame(animationRef.current);
       }
     };
-  }, [isPlaying, isLoaded, animate]);
+  }, [isPlaying, isLoaded, animateStep]);
 
   // Load the sprite sheet image
   useEffect(() => {
@@ -152,7 +171,15 @@ export default function SpriteAnimation({
   }, [src, cols, rows, drawFrame, displayWidth, displayHeight]);
 
   const togglePlay = () => {
-    setIsPlaying((prev) => !prev);
+    if (isStopped) {
+      // Restart from beginning
+      frameRef.current = 0;
+      stoppedRef.current = false;
+      setIsStopped(false);
+      setIsPlaying(true);
+    } else {
+      setIsPlaying((prev) => !prev);
+    }
   };
 
   const toggleDirection = () => {
