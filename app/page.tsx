@@ -1,6 +1,7 @@
 import Nav from "./components/Nav";
 import Hero from "./components/Hero";
 import Section from "./components/Section";
+import SpriteAnimation from "@/app/components/SpriteAnimation";
 
 const sections = [
   {
@@ -60,6 +61,17 @@ export default function Home() {
           cards={section.cards}
         />
       ))}
+      {/*<SpriteAnimation*/}
+      {/*    src="/animations/sprite_open_box_8x6.webp"*/}
+      {/*    cols={8}*/}
+      {/*    rows={6}*/}
+      {/*    fps={24}*/}
+      {/*    autoPlay*/}
+      {/*    displayWidth={320}*/}
+      {/*    displayHeight={320}*/}
+      {/*    className="mx-auto my-8 rounded-xl shadow-lg"*/}
+      {/*/>*/}
+
       {/* Footer */}
       <footer className="bg-gray-900 text-gray-400 text-center py-8 text-sm snap-start">
         <p>&copy; 2026 KinderPlay. All rights reserved.</p>
