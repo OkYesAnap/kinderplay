@@ -61,16 +61,16 @@ export default function Home() {
           cards={section.cards}
         />
       ))}
-      {/*<SpriteAnimation*/}
-      {/*    src="/animations/sprite_open_box_8x6.webp"*/}
-      {/*    cols={8}*/}
-      {/*    rows={6}*/}
-      {/*    fps={24}*/}
-      {/*    autoPlay*/}
-      {/*    displayWidth={320}*/}
-      {/*    displayHeight={320}*/}
-      {/*    className="mx-auto my-8 rounded-xl shadow-lg"*/}
-      {/*/>*/}
+      <SpriteAnimation
+          src={["/animations/sprite_open_box_8x6.webp", "/animations/sprite_get_cpu_8x6.webp"]}
+          cols={8}
+          rows={6}
+          fps={24}
+          autoPlay
+          displayWidth={640}
+          displayHeight={640}
+          className="mx-auto my-8 rounded-xl shadow-lg"
+      />
 
       {/* Footer */}
       <footer className="bg-gray-900 text-gray-400 text-center py-8 text-sm snap-start">

@@ -1,13 +1,31 @@
 "use client";
 
-import { useState, useRef, useEffect, useCallback } from "react";
+import { useState, useRef, useEffect, useCallback, useMemo } from "react";
+
+/** Resolved per-sprite-sheet configuration */
+interface SheetConfig {
+  /** URL of the sprite sheet image */
+  url: string;
+  /** Number of columns */
+  cols: number;
+  /** Number of rows */
+  rows: number;
+  /** Playback order index */
+  order: number;
+}
 
 interface SpriteAnimationProps {
-  /** URL of the sprite sheet image */
-  src: string;
-  /** Number of columns in the sprite sheet */
+  /**
+   * Array of sprite sheet URLs or per-sheet configs.
+   * Sheets are concatenated into one continuous animation played sequentially.
+   *
+   * - `string[]`  → uses shared `cols` / `rows` for every sheet
+   * - `{ url: string; cols?: number; rows?: number; order?: number }[]` → each sheet can override its own `cols` / `rows` and playback order
+   */
+  src: (string | { url: string; cols?: number; rows?: number; order?: number })[];
+  /** Default columns (applied to every sheet unless overridden per-sheet) */
   cols: number;
-  /** Number of rows in the sprite sheet */
+  /** Default rows (applied to every sheet unless overridden per-sheet) */
   rows: number;
   /** Frames per second for animation speed */
   fps?: number;
@@ -34,7 +52,8 @@ export default function SpriteAnimation({
   className = "",
 }: SpriteAnimationProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const imageRef = useRef<HTMLImageElement | null>(null);
+  const sheetsRef = useRef<SheetConfig[]>([]);
+  const imagesRef = useRef<Image[]>([]);
   const animationRef = useRef<number>(0);
   const frameRef = useRef<number>(0);
   const lastTimeRef = useRef<number>(0);
@@ -46,26 +65,71 @@ export default function SpriteAnimation({
   const [isStopped, setIsStopped] = useState(false);
   const [direction, setDirection] = useState<Direction>("forward");
 
-  const totalFrames = cols * rows;
+  // Resolve src prop into sheet configurations (derived via useMemo)
+  const sheets = useMemo<SheetConfig[]>(() => {
+    const resolved: SheetConfig[] = src.map((item, i) => ({
+      url: typeof item === "string" ? item : item.url,
+      rows: typeof item === "string" ? rows : item.rows ?? rows,
+      cols: typeof item === "string" ? cols : item.cols ?? cols,
+      order: typeof item === "string" ? i : (item.order ?? i),
+    }));
+    resolved.sort((a, b) => a.order - b.order);
+    return resolved;
+  }, [src, rows, cols]);
+
+  // Keep a ref mirror for non-render-time access (drawFrame, animation loop)
+  useEffect(() => {
+    sheetsRef.current = sheets;
+  }, [sheets]);
+
+  // Per-sheet frame counts derived from resolved config
+  const frameCountsPerSheet = useMemo(
+    () => sheets.map((s) => s.rows * s.cols),
+    [sheets]
+  );
+
+  const totalFrames = useMemo(
+    () => frameCountsPerSheet.reduce((sum, n) => sum + n, 0),
+    [frameCountsPerSheet]
+  );
+
   const frameDuration = 1000 / fps;
 
   const drawFrame = useCallback(
-    (frameIndex: number) => {
+    (globalFrame: number) => {
       const canvas = canvasRef.current;
-      const image = imageRef.current;
-      if (!canvas || !image) return;
+      if (!canvas) return;
+
+      const sheets = sheetsRef.current;
+      const images = imagesRef.current;
+      if (sheets.length === 0 || images.length === 0) return;
+
+      // Map global frame index to (sheetIndex, localFrameIndex)
+      let remaining = globalFrame;
+      let sheetIndex = 0;
+      for (let i = 0; i < sheets.length; i++) {
+        const count = sheets[i].rows * sheets[i].cols;
+        if (remaining < count) {
+          sheetIndex = i;
+          break;
+        }
+        remaining -= count;
+        sheetIndex = i; // fallback: last sheet
+      }
+
+      const sheet = sheets[sheetIndex];
+      const image = images[sheetIndex];
+      if (!image) return;
 
       const ctx = canvas.getContext("2d");
       if (!ctx) return;
 
-      const frameWidth = image.naturalWidth / cols;
-      const frameHeight = image.naturalHeight / rows;
+      const frameWidth = image.naturalWidth / sheet.cols;
+      const frameHeight = image.naturalHeight / sheet.rows;
 
-      // Calculate row and column from linear frame index
-      const col = frameIndex % cols;
-      const row = Math.floor(frameIndex / cols);
+      const col = remaining % sheet.cols;
+      const row = Math.floor(remaining / sheet.cols);
 
-      // Clear and draw the current frame
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       ctx.drawImage(
         image,
@@ -79,15 +143,19 @@ export default function SpriteAnimation({
         canvas.height
       );
     },
-    [cols, rows]
+    []
   );
 
-  const animateStep = useCallback(
-    (timestamp: number) => {
+  // Keep latest animation callback behind a ref to avoid stale closures in rAF
+  const animateStepRef = useRef<((timestamp: number) => void) | null>(null);
+
+  // Update the ref whenever dependencies change (avoids ref assignment during render)
+  useEffect(() => {
+    animateStepRef.current = (timestamp: number) => {
       if (lastTimeRef.current === 0) {
         lastTimeRef.current = timestamp;
         // Schedule next frame immediately for the first call
-        animationRef.current = requestAnimationFrame(animateStep);
+        animationRef.current = requestAnimationFrame(animateStepRef.current);
         return;
       }
 
@@ -115,17 +183,16 @@ export default function SpriteAnimation({
         drawFrame(frameRef.current);
       }
 
-      animationRef.current = requestAnimationFrame(animateStep);
-    },
-    [direction, totalFrames, frameDuration, drawFrame]
-  );
+      animationRef.current = requestAnimationFrame(animateStepRef.current);
+    };
+  }, [direction, totalFrames, frameDuration, drawFrame]);
 
   // Start / stop animation + sync stopped state to UI
   useEffect(() => {
     if (isPlaying && isLoaded) {
       lastTimeRef.current = 0;
       stoppedRef.current = false;
-      animationRef.current = requestAnimationFrame(animateStep);
+      animationRef.current = requestAnimationFrame(animateStepRef.current);
     } else if (stoppedRef.current) {
       // Animation reached its natural end — update UI state once
       setIsPlaying(false);
@@ -137,38 +204,54 @@ export default function SpriteAnimation({
         cancelAnimationFrame(animationRef.current);
       }
     };
-  }, [isPlaying, isLoaded, animateStep]);
+  }, [isPlaying, isLoaded]);
 
-  // Load the sprite sheet image
+  // Load all sprite sheet images concurrently
   useEffect(() => {
-    const image = new Image();
-    image.crossOrigin = "anonymous";
-    imageRef.current = image;
+    if (sheets.length === 0) return;
 
-    image.onload = () => {
-      setIsLoaded(true);
-      setIsError(false);
+    let loadedCount = 0;
+    let hasError = false;
 
-      const canvas = canvasRef.current;
-      if (canvas) {
-        if (displayWidth && displayHeight) {
-          canvas.width = displayWidth;
-          canvas.height = displayHeight;
-        } else {
-          canvas.width = image.naturalWidth / cols;
-          canvas.height = image.naturalHeight / rows;
+    // Pre-create Image objects for every sheet
+    const images: Image[] = sheets.map(() => {
+      const img = new Image();
+      img.crossOrigin = "anonymous";
+      return img;
+    });
+
+    images.forEach((img, idx) => {
+      img.onload = () => {
+        loadedCount += 1;
+        if (loadedCount === sheets.length && !hasError) {
+          imagesRef.current = images;
+          setIsLoaded(true);
+
+          // Size canvas from the first sheet's frame dimensions
+          const canvas = canvasRef.current;
+          if (canvas) {
+            if (displayWidth && displayHeight) {
+              canvas.width = displayWidth;
+              canvas.height = displayHeight;
+            } else {
+              const first = sheets[0];
+              canvas.width = images[0].naturalWidth / first.cols;
+              canvas.height = images[0].naturalHeight / first.rows;
+            }
+            drawFrame(frameRef.current);
+          }
         }
-        drawFrame(frameRef.current);
-      }
-    };
+      };
 
-    image.onerror = () => {
-      setIsLoaded(false);
-      setIsError(true);
-    };
+      img.onerror = () => {
+        hasError = true;
+        setIsLoaded(false);
+        setIsError(true);
+      };
 
-    image.src = src;
-  }, [src, cols, rows, drawFrame, displayWidth, displayHeight]);
+      img.src = sheets[idx].url;
+    });
+  }, [sheets, drawFrame, displayWidth, displayHeight]);
 
   const togglePlay = () => {
     if (isStopped) {
@@ -197,7 +280,7 @@ export default function SpriteAnimation({
           minHeight: displayHeight ? undefined : "200px",
         }}
       >
-        <p>Failed to load sprite sheet: {src}</p>
+        <p>Failed to load sprite sheet(s): {src.length} source(s)</p>
       </div>
     );
   }
@@ -222,6 +305,8 @@ export default function SpriteAnimation({
     <div className={`flex flex-col items-center gap-3 ${className}`}>
       <canvas
         ref={canvasRef}
+        width={displayWidth}
+        height={displayHeight}
         className="rounded-lg"
         style={{
           width: displayWidth,
@@ -234,7 +319,7 @@ export default function SpriteAnimation({
         {/* Play / Pause button */}
         <button
           onClick={togglePlay}
-          className="flex items-center gap-1 rounded-lg bg-gray-800 px-3 py-1.5 text-sm font-medium text-white transition hover:bg-gray-700 active:bg-gray-900"
+          className="flex items-center gap-1 rounded-lg bg-gray-800 px-3 py-1.5 text-sm font-medium text-white transition hover:bg-gray-700"
           aria-label={isPlaying ? "Pause" : "Play"}
         >
           {isPlaying ? (
@@ -268,7 +353,7 @@ export default function SpriteAnimation({
         {/* Direction toggle button */}
         <button
           onClick={toggleDirection}
-          className="flex items-center gap-1 rounded-lg bg-gray-800 px-3 py-1.5 text-sm font-medium text-white transition hover:bg-gray-700 active:bg-gray-900"
+          className="flex items-center gap-1 rounded-lg bg-gray-800 px-3 py-1.5 text-sm font-medium text-white transition hover:bg-gray-700"
           aria-label={`Switch to ${direction === "forward" ? "reverse" : "forward"}`}
         >
           {direction === "forward" ? (
