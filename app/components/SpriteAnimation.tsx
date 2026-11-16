@@ -53,7 +53,7 @@ export default function SpriteAnimation({
 }: SpriteAnimationProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const sheetsRef = useRef<SheetConfig[]>([]);
-  const imagesRef = useRef<Image[]>([]);
+  const imagesRef = useRef<HTMLImageElement[]>([]);
   const animationRef = useRef<number>(0);
   const frameRef = useRef<number>(0);
   const lastTimeRef = useRef<number>(0);
@@ -155,7 +155,7 @@ export default function SpriteAnimation({
       if (lastTimeRef.current === 0) {
         lastTimeRef.current = timestamp;
         // Schedule next frame immediately for the first call
-        animationRef.current = requestAnimationFrame(animateStepRef.current);
+        animationRef.current = requestAnimationFrame(animateStepRef.current as FrameRequestCallback);
         return;
       }
 
@@ -183,7 +183,7 @@ export default function SpriteAnimation({
         drawFrame(frameRef.current);
       }
 
-      animationRef.current = requestAnimationFrame(animateStepRef.current);
+      animationRef.current = requestAnimationFrame(animateStepRef.current as FrameRequestCallback);
     };
   }, [direction, totalFrames, frameDuration, drawFrame]);
 
@@ -192,7 +192,7 @@ export default function SpriteAnimation({
     if (isPlaying && isLoaded) {
       lastTimeRef.current = 0;
       stoppedRef.current = false;
-      animationRef.current = requestAnimationFrame(animateStepRef.current);
+      animationRef.current = requestAnimationFrame(animateStepRef.current as FrameRequestCallback);
     } else if (stoppedRef.current) {
       // Animation reached its natural end — update UI state once
       setIsPlaying(false);
@@ -214,7 +214,7 @@ export default function SpriteAnimation({
     let hasError = false;
 
     // Pre-create Image objects for every sheet
-    const images: Image[] = sheets.map(() => {
+    const images: HTMLImageElement[] = sheets.map(() => {
       const img = new Image();
       img.crossOrigin = "anonymous";
       return img;
