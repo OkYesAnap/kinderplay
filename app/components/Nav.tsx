@@ -7,7 +7,8 @@ const sections = [
   { id: "home", label: "Home", icon: "🏠" },
   { id: "wishes", label: "Wishes", icon: "🎂" },
   { id: "games", label: "Games", icon: "🎮" },
-  { id: "movies", label: "Movies", icon: "🎬" },
+  // { id: "movies", label: "Movies", icon: "🎬" },
+  { id: "mypc", label: "MyPC", icon: "💻" },
 ];
 
 export default function Nav() {

@@ -1,7 +1,7 @@
 import Nav from "./components/Nav";
 import Hero from "./components/Hero";
 import Section from "./components/Section";
-import SpriteAnimation from "@/app/components/SpriteAnimation";
+import MyPc from "./components/MyPc";
 
 const sections = [
   {
@@ -27,22 +27,22 @@ const sections = [
       { title: "Word Search", description: "Find hidden words in the grid.", image: "/images/games-bg.jpg", targetAmount: 800, currentAmount: 200 },
     ],
   },
-  {
-    id: "movies",
-    label: "Movies",
-    icon: "🎬",
-    bg: "/images/movies-bg.jpg",
-    gradient: "from-orange-500/60 to-red-500/60",
-    cards: [
-      { title: "Adventure Island", description: "Join a thrilling jungle adventure!", image: "/images/movies-bg.jpg", targetAmount: 3000, currentAmount: 2800 },
-      { title: "Space Explorers", description: "Blast off into outer space.", image: "/images/movies-bg.jpg", targetAmount: 1500, currentAmount: 1500 },
-      { title: "Magical Kingdom", description: "A fairy tale come to life.", image: "/images/movies-bg.jpg", targetAmount: 2500, currentAmount: 1000 },
-      { title: "Ocean Friends", description: "Dive into an underwater world.", image: "/images/movies-bg.jpg", targetAmount: 1800, currentAmount: 900 },
-
-      { title: "Magical Kingdom", description: "A fairy tale come to life.", image: "/images/movies-bg.jpg", targetAmount: 2500, currentAmount: 1000 },
-      { title: "Ocean Friends", description: "Dive into an underwater world.", image: "/images/movies-bg.jpg", targetAmount: 1800, currentAmount: 900 },
-    ],
-  },
+  // {
+  //   id: "movies",
+  //   label: "Movies",
+  //   icon: "🎬",
+  //   bg: "/images/movies-bg.jpg",
+  //   gradient: "from-orange-500/60 to-red-500/60",
+  //   cards: [
+  //     { title: "Adventure Island", description: "Join a thrilling jungle adventure!", image: "/images/movies-bg.jpg", targetAmount: 3000, currentAmount: 2800 },
+  //     { title: "Space Explorers", description: "Blast off into outer space.", image: "/images/movies-bg.jpg", targetAmount: 1500, currentAmount: 1500 },
+  //     { title: "Magical Kingdom", description: "A fairy tale come to life.", image: "/images/movies-bg.jpg", targetAmount: 2500, currentAmount: 1000 },
+  //     { title: "Ocean Friends", description: "Dive into an underwater world.", image: "/images/movies-bg.jpg", targetAmount: 1800, currentAmount: 900 },
+  //
+  //     { title: "Magical Kingdom", description: "A fairy tale come to life.", image: "/images/movies-bg.jpg", targetAmount: 2500, currentAmount: 1000 },
+  //     { title: "Ocean Friends", description: "Dive into an underwater world.", image: "/images/movies-bg.jpg", targetAmount: 1800, currentAmount: 900 },
+  //   ],
+  // },
 ];
 
 export default function Home() {
@@ -61,16 +61,7 @@ export default function Home() {
           cards={section.cards}
         />
       ))}
-      <SpriteAnimation
-          src={["/animations/sprite_open_box_8x6.webp", "/animations/sprite_get_cpu_8x6.webp"]}
-          cols={8}
-          rows={6}
-          fps={24}
-          autoPlay
-          displayWidth={640}
-          displayHeight={640}
-          className="mx-auto my-8 rounded-xl shadow-lg"
-      />
+      <MyPc />
 
       {/* Footer */}
       <footer className="bg-gray-900 text-gray-400 text-center py-8 text-sm snap-start">
