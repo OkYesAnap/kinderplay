@@ -32,7 +32,7 @@ export default function MyPc() {
               {pcSpecs.map((spec, i) => (
                 <li onClick={() => {setAnimationPath(spec.endAnimationPath || '')}}
                   key={i}
-                  className="flex items-start gap-4 p-3 rounded-xl bg-white/5 hover:bg-white/10 transition-colors"
+                  className="flex items-start gap-4 p-3 rounded-xl bg-white/5 hover:bg-white/10 transition-colors cursor-pointer"
                 >
                   <span className="text-2xl shrink-0 mt-0.5 text-white">
                     <spec.icon className="w-6 h-6" />
