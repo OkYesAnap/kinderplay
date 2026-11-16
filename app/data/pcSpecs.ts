@@ -13,11 +13,12 @@ import {
 export interface SpecItem {
   key: string;
   label: string;
+  endAnimationPath?: string;
   icon: ComponentType<{ className?: string }>;
 }
 
 const pcSpecs: SpecItem[] = [
-  { key: "processor", label: "Процессор: AMD Ryzen 9 7900", icon: Cpu },
+  { key: "processor", label: "Процессор: AMD Ryzen 9 7900", icon: Cpu, endAnimationPath: "/animations/sprite_get_cpu_8x6.webp" },
   { key: "gpu", label: "Видеокарта: MSI GeForce RTX 4080 GAMING X SLIM WHITE", icon: Monitor },
   { key: "ram", label: "ОЗУ: ADATA XPG Lancer 32 ГБ 5600 МГц DDR5", icon: HardDrive },
   { key: "motherboard", label: "Материнская плата: ASUS PRIME X670E-PRO WIFI", icon: Network },

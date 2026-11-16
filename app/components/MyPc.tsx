@@ -2,8 +2,10 @@
 
 import pcSpecs from "../data/pcSpecs"
 import SpriteAnimation from "./SpriteAnimation"
+import {useState} from "react";
 
 export default function MyPc() {
+  const [endAnimationPath, setAnimationPath] = useState<string>('');
   return (
     <section
       id="mypc"
@@ -28,7 +30,7 @@ export default function MyPc() {
                 <h2 className="text-4xl font-bold text-white drop-shadow">Мой ПК</h2>
               </div>
               {pcSpecs.map((spec, i) => (
-                <li
+                <li onClick={() => {setAnimationPath(spec.endAnimationPath || '')}}
                   key={i}
                   className="flex items-start gap-4 p-3 rounded-xl bg-white/5 hover:bg-white/10 transition-colors"
                 >
@@ -46,7 +48,7 @@ export default function MyPc() {
           {/* Right: Sprite Animation */}
           <div className="flex items-center justify-center">
             <SpriteAnimation
-              src={["/animations/sprite_open_box_8x6.webp", "/animations/sprite_get_cpu_8x6.webp"]}
+              src={endAnimationPath ? ["/animations/sprite_open_box_8x6.webp", endAnimationPath] : ["/animations/sprite_open_box_8x6.webp"]}
               cols={8}
               rows={6}
               fps={60}
