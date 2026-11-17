@@ -1,4 +1,4 @@
-"use client"
+'use client';
 
 import pcSpecs from "../data/pcSpecs"
 import SpriteAnimation from "./SpriteAnimation"

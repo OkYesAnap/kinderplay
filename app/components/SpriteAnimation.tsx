@@ -1,6 +1,12 @@
-"use client";
+'use client';
 
-import { useState, useRef, useEffect, useCallback, useMemo } from "react";
+import {
+  useRef,
+  useEffect,
+  useCallback,
+  useMemo,
+  useState,
+} from "react";
 
 /** Resolved per-sprite-sheet configuration */
 interface SheetConfig {
@@ -46,7 +52,7 @@ export default function SpriteAnimation({
   cols,
   rows,
   fps = 12,
-  autoPlay = true,
+  autoPlay = false,
   displayWidth,
   displayHeight,
   className = "",
@@ -59,10 +65,10 @@ export default function SpriteAnimation({
   const lastTimeRef = useRef<number>(0);
   const stoppedRef = useRef(false);
 
+  // Local state (replaces Redux spriteAnimationSlice)
   const [isLoaded, setIsLoaded] = useState(false);
   const [isError, setIsError] = useState(false);
   const [isPlaying, setIsPlaying] = useState(autoPlay);
-  const [isStopped, setIsStopped] = useState(false);
   const [direction, setDirection] = useState<Direction>("forward");
 
   // Resolve src prop into sheet configurations (derived via useMemo)
@@ -196,7 +202,6 @@ export default function SpriteAnimation({
     } else if (stoppedRef.current) {
       // Animation reached its natural end — update UI state once
       setIsPlaying(false);
-      setIsStopped(true);
     }
 
     return () => {
@@ -254,15 +259,7 @@ export default function SpriteAnimation({
   }, [sheets, drawFrame, displayWidth, displayHeight]);
 
   const togglePlay = () => {
-    if (isStopped) {
-      // Restart from beginning
-      frameRef.current = 0;
-      stoppedRef.current = false;
-      setIsStopped(false);
-      setIsPlaying(true);
-    } else {
       setIsPlaying((prev) => !prev);
-    }
   };
 
   const toggleDirection = () => {
