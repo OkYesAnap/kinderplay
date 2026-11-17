@@ -3,12 +3,14 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 type Direction = "forward" | "reverse";
 
+interface AnimationParams {begin: { src: string, direction: Direction }, end: { src: string, direction: Direction } };
 interface SpriteAnimationState {
   isPlaying: boolean;
   isLoaded: boolean;
   frameCount: number;
   isError: boolean;
   direction: Direction;
+  animationParams: AnimationParams
 }
 
 const initialState: SpriteAnimationState = {
@@ -17,6 +19,7 @@ const initialState: SpriteAnimationState = {
   frameCount: 0,
   isError: false,
   direction: "forward",
+  animationParams: {begin: {src:'/animations/sprite_open_box_8x6.webp', direction: "forward"}, end: {src:'', direction: 'forward'}},
 };
 
 const spriteAnimationSlice = createSlice({
@@ -46,6 +49,9 @@ const spriteAnimationSlice = createSlice({
     toggleDirection: (state) => {
       state.direction = state.direction === "forward" ? "reverse" : "forward";
     },
+    setAnimation: (state, action: PayloadAction<AnimationParams>) => {
+      state.animationParams = action.payload;
+    },
     reset: () => initialState,
   },
 });
@@ -58,6 +64,7 @@ export const {
   setDirection,
   togglePlaying,
   toggleDirection,
+  setAnimation,
   reset,
 } = spriteAnimationSlice.actions;
 
@@ -66,5 +73,6 @@ export const selectIsLoaded = (state: AppState) => state.spriteAnimation.isLoade
 export const selectFrameCount = (state: AppState) => state.spriteAnimation.frameCount;
 export const selectIsError = (state: AppState) => state.spriteAnimation.isError;
 export const selectDirection = (state: AppState) => state.spriteAnimation.direction;
+export const selectAnimationParams = (state: AppState) => state.spriteAnimation.animationParams;
 
 export default spriteAnimationSlice.reducer;
