@@ -52,7 +52,6 @@ export default function MyPc() {
               cols={8}
               rows={6}
               fps={60}
-              autoPlay
               displayWidth={640}
               displayHeight={640}
               className="rounded-xl shadow-lg"

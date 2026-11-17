@@ -149,7 +149,7 @@ export default function SpriteAnimation({
         canvas.height
       );
     },
-    []
+    [isLoaded]
   );
 
   // Keep latest animation callback behind a ref to avoid stale closures in rAF
@@ -170,22 +170,20 @@ export default function SpriteAnimation({
       if (elapsed >= frameDuration) {
         lastTimeRef.current = timestamp;
 
-        if (direction === "forward") {
-          if (frameRef.current >= totalFrames - 1) {
+        if (direction === "forward" && frameRef.current >= totalFrames - 1) {
             // Reached last frame — mark stopped, don't request next frame
+            setIsPlaying(false);
+            setDirection("reverse");
             stoppedRef.current = true;
             return;
-          }
-          frameRef.current += 1;
-        } else {
-          if (frameRef.current <= 0) {
+        } else if (direction === "reverse" && frameRef.current <= 0) {
             // Reached first frame — mark stopped, don't request next frame
+            setIsPlaying(false);
+            setDirection("forward");
             stoppedRef.current = true;
             return;
-          }
-          frameRef.current -= 1;
         }
-
+        frameRef.current += direction === "forward" ? 1 : -1;
         drawFrame(frameRef.current);
       }
 
