@@ -49,8 +49,8 @@ const spriteAnimationSlice = createSlice({
     toggleDirection: (state) => {
       state.direction = state.direction === "forward" ? "reverse" : "forward";
     },
-    setAnimation: (state, action: PayloadAction<AnimationParams>) => {
-      state.animationParams = action.payload;
+    setAnimationParams: (state, action: PayloadAction<AnimationParams>) => {
+      state.animationParams = {...action.payload};
     },
     reset: () => initialState,
   },
@@ -64,7 +64,7 @@ export const {
   setDirection,
   togglePlaying,
   toggleDirection,
-  setAnimation,
+  setAnimationParams,
   reset,
 } = spriteAnimationSlice.actions;
 

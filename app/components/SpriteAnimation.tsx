@@ -8,6 +8,7 @@ import {
 } from "react";
 import {useDispatch, useSelector} from "react-redux";
 import {
+    selectAnimationParams,
     selectDirection,
     selectIsError,
     selectIsLoaded,
@@ -16,45 +17,25 @@ import {
     setIsPlaying
 } from "@/app/slices/spriteAnimationSlice";
 
-/** Resolved per-sprite-sheet configuration */
 interface SheetConfig {
-  /** URL of the sprite sheet image */
   url: string;
-  /** Number of columns */
   cols: number;
-  /** Number of rows */
   rows: number;
-  /** Playback order index */
   order: number;
 }
 
 interface SpriteAnimationProps {
-  /**
-   * Array of sprite sheet URLs or per-sheet configs.
-   * Sheets are concatenated into one continuous animation played sequentially.
-   *
-   * - `string[]`  → uses shared `cols` / `rows` for every sheet
-   * - `{ url: string; cols?: number; rows?: number; order?: number }[]` → each sheet can override its own `cols` / `rows` and playback order
-   */
-  src: (string | { url: string; cols?: number; rows?: number; order?: number })[];
-  /** Default columns (applied to every sheet unless overridden per-sheet) */
   cols: number;
-  /** Default rows (applied to every sheet unless overridden per-sheet) */
   rows: number;
-  /** Frames per second for animation speed */
   fps?: number;
-  /** Whether to start playing automatically on mount */
   autoPlay?: boolean;
-  /** Optional CSS width for the display area */
   displayWidth?: number;
-  /** Optional CSS height for the display area */
   displayHeight?: number;
-  /** Optional wrapper class */
   className?: string;
 }
 
 export default function SpriteAnimation({
-  src,
+  // src,
   cols,
   rows,
   fps = 12,
@@ -75,18 +56,24 @@ export default function SpriteAnimation({
   const isLoaded = useSelector(selectIsLoaded);
   const isError = useSelector(selectIsError);
   const direction = useSelector(selectDirection);
+  const animationProps = useSelector(selectAnimationParams);
 
   // Resolve src prop into sheet configurations (derived via useMemo)
   const sheets = useMemo<SheetConfig[]>(() => {
-    const resolved: SheetConfig[] = src.map((item, i) => ({
-      url: typeof item === "string" ? item : item.url,
-      rows: typeof item === "string" ? rows : item.rows ?? rows,
-      cols: typeof item === "string" ? cols : item.cols ?? cols,
-      order: typeof item === "string" ? i : (item.order ?? i),
-    }));
-    resolved.sort((a, b) => a.order - b.order);
+      const resolved: SheetConfig[] = Object.values(animationProps).reduce((acc, item, i: number) => {
+          if (item.src) {
+              acc.push({
+                  url: item.src,
+                  rows: rows,
+                  cols: cols,
+                  order: i,
+              })
+          }
+          return acc;
+      }, []);
+    console.log(resolved);
     return resolved;
-  }, [src, rows, cols]);
+  }, [animationProps, cols, rows]);
 
   // Keep a ref mirror for non-render-time access (drawFrame, animation loop)
   useEffect(() => {
@@ -279,7 +266,7 @@ export default function SpriteAnimation({
           minHeight: displayHeight ? undefined : "200px",
         }}
       >
-        <p>Failed to load sprite sheet(s): {src.length} source(s)</p>
+        <p>Failed to load sprite sheet(s) source(s)</p>
       </div>
     );
   }

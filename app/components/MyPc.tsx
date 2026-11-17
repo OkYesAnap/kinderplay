@@ -2,10 +2,11 @@
 
 import pcSpecs from "../data/pcSpecs"
 import SpriteAnimation from "./SpriteAnimation"
-import {useState} from "react";
+import {useDispatch} from "react-redux";
+import {setAnimationParams, setIsPlaying} from "@/app/slices/spriteAnimationSlice";
 
 export default function MyPc() {
-  const [endAnimationPath, setAnimationPath] = useState<string>('');
+  const dispatch = useDispatch();
   return (
     <section
       id="mypc"
@@ -30,7 +31,12 @@ export default function MyPc() {
                 <h2 className="text-4xl font-bold text-white drop-shadow">Мой ПК</h2>
               </div>
               {pcSpecs.map((spec, i) => (
-                <li onClick={() => {setAnimationPath(spec.endAnimationPath || '')}}
+                <li onClick={() => {
+                  dispatch(setAnimationParams({
+                    begin: {src: "/animations/sprite_open_box_8x6.webp", direction: "forward"},
+                    end:{src: spec.endAnimationPath || '', direction: "forward"}}));
+                  dispatch(setIsPlaying(true));
+                }}
                   key={i}
                   className="flex items-start gap-4 p-3 rounded-xl bg-white/5 hover:bg-white/10 transition-colors cursor-pointer"
                 >
@@ -48,7 +54,7 @@ export default function MyPc() {
           {/* Right: Sprite Animation */}
           <div className="flex items-center justify-center">
             <SpriteAnimation
-              src={endAnimationPath ? ["/animations/sprite_open_box_8x6.webp", endAnimationPath] : ["/animations/sprite_open_box_8x6.webp"]}
+              // src={endAnimationPath ? ["/animations/sprite_open_box_8x6.webp", endAnimationPath] : ["/animations/sprite_open_box_8x6.webp"]}
               cols={8}
               rows={6}
               fps={60}
