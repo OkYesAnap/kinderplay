@@ -5,8 +5,16 @@ import {
   useEffect,
   useCallback,
   useMemo,
-  useState,
 } from "react";
+import {useDispatch, useSelector} from "react-redux";
+import {
+    selectDirection,
+    selectIsError,
+    selectIsLoaded,
+    selectIsPlaying, setDirection, setIsError,
+    setIsLoaded,
+    setIsPlaying
+} from "@/app/slices/spriteAnimationSlice";
 
 /** Resolved per-sprite-sheet configuration */
 interface SheetConfig {
@@ -45,14 +53,11 @@ interface SpriteAnimationProps {
   className?: string;
 }
 
-type Direction = "forward" | "reverse";
-
 export default function SpriteAnimation({
   src,
   cols,
   rows,
   fps = 12,
-  autoPlay = false,
   displayWidth,
   displayHeight,
   className = "",
@@ -65,11 +70,11 @@ export default function SpriteAnimation({
   const lastTimeRef = useRef<number>(0);
   const stoppedRef = useRef(false);
 
-  // Local state (replaces Redux spriteAnimationSlice)
-  const [isLoaded, setIsLoaded] = useState(false);
-  const [isError, setIsError] = useState(false);
-  const [isPlaying, setIsPlaying] = useState(autoPlay);
-  const [direction, setDirection] = useState<Direction>("forward");
+  const dispatch = useDispatch();
+  const isPlaying = useSelector(selectIsPlaying);
+  const isLoaded = useSelector(selectIsLoaded);
+  const isError = useSelector(selectIsError);
+  const direction = useSelector(selectDirection);
 
   // Resolve src prop into sheet configurations (derived via useMemo)
   const sheets = useMemo<SheetConfig[]>(() => {
@@ -149,7 +154,7 @@ export default function SpriteAnimation({
         canvas.height
       );
     },
-    [isLoaded]
+    []
   );
 
   // Keep latest animation callback behind a ref to avoid stale closures in rAF
@@ -172,14 +177,14 @@ export default function SpriteAnimation({
 
         if (direction === "forward" && frameRef.current >= totalFrames - 1) {
             // Reached last frame — mark stopped, don't request next frame
-            setIsPlaying(false);
-            setDirection("reverse");
+            dispatch(setIsPlaying(false));
+            dispatch(setDirection("reverse"));
             stoppedRef.current = true;
             return;
         } else if (direction === "reverse" && frameRef.current <= 0) {
             // Reached first frame — mark stopped, don't request next frame
-            setIsPlaying(false);
-            setDirection("forward");
+            dispatch(setIsPlaying(false));
+            dispatch(setDirection("forward"));
             stoppedRef.current = true;
             return;
         }
@@ -189,17 +194,16 @@ export default function SpriteAnimation({
 
       animationRef.current = requestAnimationFrame(animateStepRef.current as FrameRequestCallback);
     };
-  }, [direction, totalFrames, frameDuration, drawFrame]);
+  }, [direction, totalFrames, frameDuration, drawFrame, dispatch]);
 
   // Start / stop animation + sync stopped state to UI
   useEffect(() => {
     if (isPlaying && isLoaded) {
-      lastTimeRef.current = 0;
       stoppedRef.current = false;
       animationRef.current = requestAnimationFrame(animateStepRef.current as FrameRequestCallback);
     } else if (stoppedRef.current) {
       // Animation reached its natural end — update UI state once
-      setIsPlaying(false);
+      dispatch(setIsPlaying(false));
     }
 
     return () => {
@@ -207,7 +211,7 @@ export default function SpriteAnimation({
         cancelAnimationFrame(animationRef.current);
       }
     };
-  }, [isPlaying, isLoaded]);
+  }, [dispatch, isLoaded, isPlaying]);
 
   // Load all sprite sheet images concurrently
   useEffect(() => {
@@ -228,7 +232,7 @@ export default function SpriteAnimation({
         loadedCount += 1;
         if (loadedCount === sheets.length && !hasError) {
           imagesRef.current = images;
-          setIsLoaded(true);
+          dispatch(setIsLoaded(true));
 
           // Size canvas from the first sheet's frame dimensions
           const canvas = canvasRef.current;
@@ -249,19 +253,19 @@ export default function SpriteAnimation({
       img.onerror = () => {
         hasError = true;
         setIsLoaded(false);
-        setIsError(true);
+        dispatch(setIsError(true));
       };
 
       img.src = sheets[idx].url;
     });
-  }, [sheets, drawFrame, displayWidth, displayHeight]);
+  }, [sheets, drawFrame, displayWidth, displayHeight, dispatch]);
 
   const togglePlay = () => {
-      setIsPlaying((prev) => !prev);
+      dispatch(setIsPlaying(!isPlaying));
   };
 
   const toggleDirection = () => {
-    setDirection((prev) => (prev === "forward" ? "reverse" : "forward"));
+    dispatch(setDirection(direction === "forward" ? "reverse" : "forward"));
   };
 
   if (isError) {

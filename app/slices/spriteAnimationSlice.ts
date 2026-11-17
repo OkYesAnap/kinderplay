@@ -1,3 +1,4 @@
+import type { AppState } from "../store";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 type Direction = "forward" | "reverse";
@@ -7,7 +8,6 @@ interface SpriteAnimationState {
   isLoaded: boolean;
   frameCount: number;
   isError: boolean;
-  isStopped: boolean;
   direction: Direction;
 }
 
@@ -16,7 +16,6 @@ const initialState: SpriteAnimationState = {
   isLoaded: false,
   frameCount: 0,
   isError: false,
-  isStopped: false,
   direction: "forward",
 };
 
@@ -31,26 +30,18 @@ const spriteAnimationSlice = createSlice({
       state.isLoaded = action.payload;
     },
     setFrameCount: (state, action: PayloadAction<number>) => {
-      state.frameCount = action.payload;
+      console.log("setFrameCount", action.payload);
+      state.frameCount += action.payload;
     },
     setIsError: (state, action: PayloadAction<boolean>) => {
       state.isError = action.payload;
     },
-    setIsStopped: (state, action: PayloadAction<boolean>) => {
-      state.isStopped = action.payload;
-    },
     setDirection: (state, action: PayloadAction<Direction>) => {
       state.direction = action.payload;
     },
-    togglePlaying: (state, _action) => {
+    togglePlaying: (state) => {
       // If stopped, restart from beginning
-      if (state.isStopped) {
-        state.frameCount = 0;
-        state.isStopped = false;
-        state.isPlaying = true;
-      } else {
         state.isPlaying = !state.isPlaying;
-      }
     },
     toggleDirection: (state) => {
       state.direction = state.direction === "forward" ? "reverse" : "forward";
@@ -64,11 +55,16 @@ export const {
   setIsLoaded,
   setFrameCount,
   setIsError,
-  setIsStopped,
   setDirection,
   togglePlaying,
   toggleDirection,
   reset,
 } = spriteAnimationSlice.actions;
+
+export const selectIsPlaying = (state: AppState) => state.spriteAnimation.isPlaying;
+export const selectIsLoaded = (state: AppState) => state.spriteAnimation.isLoaded;
+export const selectFrameCount = (state: AppState) => state.spriteAnimation.frameCount;
+export const selectIsError = (state: AppState) => state.spriteAnimation.isError;
+export const selectDirection = (state: AppState) => state.spriteAnimation.direction;
 
 export default spriteAnimationSlice.reducer;
