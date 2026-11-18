@@ -16,11 +16,13 @@ import {
     setIsLoaded,
     setIsPlaying
 } from "@/app/slices/spriteAnimationSlice";
+import {Direction} from "node:tty";
 
 interface SheetConfig {
-  url: string;
+  src: string;
   cols: number;
   rows: number;
+  direction: Direction;
   order: number;
 }
 
@@ -35,7 +37,6 @@ interface SpriteAnimationProps {
 }
 
 export default function SpriteAnimation({
-  // src,
   cols,
   rows,
   fps = 12,
@@ -63,15 +64,15 @@ export default function SpriteAnimation({
       const resolved: SheetConfig[] = Object.values(animationProps).reduce((acc, item, i: number) => {
           if (item.src) {
               acc.push({
-                  url: item.src,
+                  src: item.src,
                   rows: rows,
                   cols: cols,
+                  direction: item.direction,
                   order: i,
               })
           }
           return acc;
       }, []);
-    console.log(resolved);
     return resolved;
   }, [animationProps, cols, rows]);
 
@@ -243,7 +244,7 @@ export default function SpriteAnimation({
         dispatch(setIsError(true));
       };
 
-      img.src = sheets[idx].url;
+      img.src = sheets[idx].src;
     });
   }, [sheets, drawFrame, displayWidth, displayHeight, dispatch]);
 
