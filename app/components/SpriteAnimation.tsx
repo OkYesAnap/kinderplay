@@ -58,7 +58,7 @@ export default function SpriteAnimation({
 
   // Resolve src prop into sheet configurations (derived via useMemo)
   const sheets = useMemo<SheetConfig[]>(() => {
-      return Object.values(animationProps as SheetConfig[]).reduce((acc: SheetConfig[], item, i: number) => {
+      return Object.values(animationProps as unknown as SheetConfig[]).reduce((acc: SheetConfig[], item, i: number) => {
         if (item.src) {
             acc.push({
                 src: item.src,
