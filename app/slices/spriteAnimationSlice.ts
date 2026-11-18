@@ -1,9 +1,9 @@
 import type { AppState } from "../store";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
-type Direction = "forward" | "reverse";
-
-interface AnimationParams {begin: { src: string, direction: Direction }, end: { src: string, direction: Direction } };
+export type Direction = "forward" | "reverse";
+export interface AnimationParam { src: string, direction: Direction }
+export interface AnimationParams {begin: AnimationParam, end: AnimationParam }
 interface SpriteAnimationState {
   isPlaying: boolean;
   isLoaded: boolean;

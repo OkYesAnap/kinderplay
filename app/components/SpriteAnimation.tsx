@@ -1,22 +1,19 @@
 'use client';
 
-import {
-  useRef,
-  useEffect,
-  useCallback,
-  useMemo,
-} from "react";
+import {useCallback, useEffect, useMemo, useRef,} from "react";
 import {useDispatch, useSelector} from "react-redux";
 import {
+    Direction,
     selectAnimationParams,
     selectDirection,
     selectIsError,
     selectIsLoaded,
-    selectIsPlaying, setDirection, setIsError,
+    selectIsPlaying,
+    setDirection,
+    setIsError,
     setIsLoaded,
     setIsPlaying
 } from "@/app/slices/spriteAnimationSlice";
-import {Direction} from "node:tty";
 
 interface SheetConfig {
   src: string;
@@ -61,19 +58,18 @@ export default function SpriteAnimation({
 
   // Resolve src prop into sheet configurations (derived via useMemo)
   const sheets = useMemo<SheetConfig[]>(() => {
-      const resolved: SheetConfig[] = Object.values(animationProps).reduce((acc, item, i: number) => {
-          if (item.src) {
-              acc.push({
-                  src: item.src,
-                  rows: rows,
-                  cols: cols,
-                  direction: item.direction,
-                  order: i,
-              })
-          }
-          return acc;
-      }, []);
-    return resolved;
+      return Object.values(animationProps as SheetConfig[]).reduce((acc: SheetConfig[], item, i: number) => {
+        if (item.src) {
+            acc.push({
+                src: item.src,
+                rows: rows,
+                cols: cols,
+                direction: item.direction,
+                order: i,
+            })
+        }
+        return acc;
+    }, []);
   }, [animationProps, cols, rows]);
 
   // Keep a ref mirror for non-render-time access (drawFrame, animation loop)
