@@ -9,6 +9,7 @@ import {
   setIsPlaying
 } from "@/app/slices/spriteAnimationSlice";
 import {useState} from "react";
+import {reverseDirection} from "@/app/utils/reverseDirection";
 
 export default function MyPc() {
   const dispatch = useDispatch();
@@ -41,7 +42,7 @@ export default function MyPc() {
               {pcSpecs.map((spec, i) => (
                 <li onClick={() => {
                   if (clicked === i) {
-                    dispatch(setAnimationParams({src: "/animations/sprite_open_box_8x6.webp", direction: 'forward'}));
+                    dispatch(setAnimationParams({src: "/animations/sprite_open_box_8x6.webp", direction: reverseDirection(direction)}));
                     dispatch(setIsPlaying(true));
                     setClicked(-1);
                   } else {
