@@ -121,9 +121,15 @@ export default function SpriteAnimation({
 
       const frameWidth = image.naturalWidth / sheet.cols;
       const frameHeight = image.naturalHeight / sheet.rows;
-
-      const col = remaining % sheet.cols;
-      const row = Math.floor(remaining / sheet.cols);
+      let col: number;
+      let row: number;
+      if(sheet.direction === "forward") {
+          col = remaining % sheet.cols;
+          row = Math.floor(remaining / sheet.cols);
+      } else {
+          col = (sheet.cols - 1) - remaining % sheet.cols;
+          row = (sheet.rows - 1) - Math.floor(remaining / sheet.cols);
+      }
 
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       ctx.drawImage(
