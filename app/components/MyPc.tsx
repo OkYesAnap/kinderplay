@@ -2,11 +2,19 @@
 
 import pcSpecs from "../data/pcSpecs"
 import SpriteAnimation from "./SpriteAnimation"
-import {useDispatch} from "react-redux";
-import {setAnimationParams, setIsPlaying} from "@/app/slices/spriteAnimationSlice";
+import {useDispatch, useSelector} from "react-redux";
+import {
+  selectDirection,
+  setAnimationParams,
+  setIsPlaying
+} from "@/app/slices/spriteAnimationSlice";
+import {useState} from "react";
 
 export default function MyPc() {
   const dispatch = useDispatch();
+  const direction = useSelector(selectDirection);
+  const [clicked, setClicked] = useState<number>(-1);
+
   return (
     <section
       id="mypc"
@@ -32,10 +40,16 @@ export default function MyPc() {
               </div>
               {pcSpecs.map((spec, i) => (
                 <li onClick={() => {
-                  dispatch(setAnimationParams({
-                    begin: {src: "/animations/sprite_open_box_8x6.webp", direction: "forward"},
-                    end:{src: spec.endAnimationPath || '', direction: "forward"}}));
-                  dispatch(setIsPlaying(true));
+                  if (clicked === i) {
+                    dispatch(setAnimationParams({src: "/animations/sprite_open_box_8x6.webp", direction: 'forward'}));
+                    dispatch(setIsPlaying(true));
+                    setClicked(-1);
+                  } else {
+                    dispatch(setAnimationParams(
+                        {src: spec.endAnimationPath || '', direction: direction}));
+                    dispatch(setIsPlaying(true));
+                    setClicked(i);
+                  }
                 }}
                   key={i}
                   className="flex items-start gap-4 p-3 rounded-xl bg-white/5 hover:bg-white/10 transition-colors cursor-pointer"

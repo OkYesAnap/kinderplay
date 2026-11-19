@@ -54,11 +54,11 @@ export default function SpriteAnimation({
   const isLoaded = useSelector(selectIsLoaded);
   const isError = useSelector(selectIsError);
   const direction = useSelector(selectDirection);
-  const animationProps = useSelector(selectAnimationParams);
+  const animationParams = useSelector(selectAnimationParams);
 
   // Resolve src prop into sheet configurations (derived via useMemo)
   const sheets = useMemo<SheetConfig[]>(() => {
-      return Object.values(animationProps as unknown as SheetConfig[]).reduce((acc: SheetConfig[], item, i: number) => {
+      return Object.values(animationParams as unknown as SheetConfig[]).reduce((acc: SheetConfig[], item, i: number) => {
         if (item.src) {
             acc.push({
                 src: item.src,
@@ -70,7 +70,7 @@ export default function SpriteAnimation({
         }
         return acc;
     }, []);
-  }, [animationProps, cols, rows]);
+  }, [animationParams, cols, rows]);
 
   // Keep a ref mirror for non-render-time access (drawFrame, animation loop)
   useEffect(() => {

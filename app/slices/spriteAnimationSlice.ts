@@ -1,5 +1,6 @@
 import type { AppState } from "../store";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import {reverseDirection} from "@/app/utils/reverseDirection";
 
 export type Direction = "forward" | "reverse";
 export interface AnimationParam { src: string, direction: Direction }
@@ -19,8 +20,9 @@ const initialState: SpriteAnimationState = {
   frameCount: 0,
   isError: false,
   direction: "forward",
-  animationParams: {begin: {src:'/animations/sprite_open_box_8x6.webp', direction: "forward"}, end: {src:'', direction: 'forward'}},
+  animationParams: {begin: {src:"/animations/sprite_open_box_8x6.webp", direction: "forward"}, end: {src:"", direction: "forward"}},
 };
+
 
 const spriteAnimationSlice = createSlice({
   name: "spriteAnimation",
@@ -33,7 +35,6 @@ const spriteAnimationSlice = createSlice({
       state.isLoaded = action.payload;
     },
     setFrameCount: (state, action: PayloadAction<number>) => {
-      console.log("setFrameCount", action.payload);
       state.frameCount += action.payload;
     },
     setIsError: (state, action: PayloadAction<boolean>) => {
@@ -49,8 +50,16 @@ const spriteAnimationSlice = createSlice({
     toggleDirection: (state) => {
       state.direction = state.direction === "forward" ? "reverse" : "forward";
     },
-    setAnimationParams: (state, action: PayloadAction<Partial<AnimationParams>>) => {
-      state.animationParams = {...state.animationParams, ...action.payload};
+    setAnimationParams: (state, action: PayloadAction<AnimationParam>) => {
+      let newAnim = {};
+      if(state.direction === "reverse") {
+        newAnim = {begin: action.payload};
+      } else if(state.direction === "forward") {
+        newAnim = {end: action.payload};
+      }
+      state.animationParams = {
+        ...state.animationParams, ...newAnim
+      };
     },
     reset: () => initialState,
   },
