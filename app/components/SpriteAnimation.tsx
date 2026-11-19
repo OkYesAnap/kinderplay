@@ -221,14 +221,6 @@ export default function SpriteAnimation({
           // Size canvas from the first sheet's frame dimensions
           const canvas = canvasRef.current;
           if (canvas) {
-            if (displayWidth && displayHeight) {
-              canvas.width = displayWidth;
-              canvas.height = displayHeight;
-            } else {
-              const first = sheets[0];
-              canvas.width = images[0].naturalWidth / first.cols;
-              canvas.height = images[0].naturalHeight / first.rows;
-            }
             drawFrame(frameRef.current);
           }
         }
