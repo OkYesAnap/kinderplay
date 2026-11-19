@@ -1,6 +1,5 @@
 import type { AppState } from "../store";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import {reverseDirection} from "@/app/utils/reverseDirection";
 
 export type Direction = "forward" | "reverse";
 export interface AnimationParam { src: string, direction: Direction }
