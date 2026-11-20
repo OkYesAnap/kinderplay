@@ -15,6 +15,8 @@ import {
     setIsPlaying
 } from "@/app/slices/spriteAnimationSlice";
 
+import { getSprite, loadOne, waitForPreload } from "@/app/utils/spriteCache";
+
 interface SheetConfig {
   src: string;
   cols: number;
@@ -43,7 +45,7 @@ export default function SpriteAnimation({
 }: SpriteAnimationProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const sheetsRef = useRef<SheetConfig[]>([]);
-  const imagesRef = useRef<HTMLImageElement[]>([]);
+
   const animationRef = useRef<number>(0);
   const frameRef = useRef<number>(0);
   const lastTimeRef = useRef<number>(0);
@@ -96,8 +98,7 @@ export default function SpriteAnimation({
       if (!canvas) return;
 
       const sheets = sheetsRef.current;
-      const images = imagesRef.current;
-      if (sheets.length === 0 || images.length === 0) return;
+      if (sheets.length === 0) return;
 
       // Map global frame index to (sheetIndex, localFrameIndex)
       let remaining = globalFrame;
@@ -113,7 +114,7 @@ export default function SpriteAnimation({
       }
 
       const sheet = sheets[sheetIndex];
-      const image = images[sheetIndex];
+      const image = getSprite(sheet.src);
       if (!image) return;
 
       const ctx = canvas.getContext("2d");
@@ -203,44 +204,27 @@ export default function SpriteAnimation({
     };
   }, [dispatch, isLoaded, isPlaying]);
 
-  // Load all sprite sheet images concurrently
+  // Load all sprite sheet images via the global cache
   useEffect(() => {
     if (sheets.length === 0) return;
 
-    let loadedCount = 0;
-    let hasError = false;
+    const uniqueSources = [...new Set(sheets.map((s) => s.src))];
 
-    // Pre-create Image objects for every sheet
-    const images: HTMLImageElement[] = sheets.map(() => {
-      const img = new Image();
-      img.crossOrigin = "anonymous";
-      return img;
+    Promise.all(uniqueSources.map((src) => loadOne(src))).then(() => {
+      return waitForPreload();
+    }).then(() => {
+      dispatch(setIsLoaded(true));
+
+      // Draw the initial frame
+      const canvas = canvasRef.current;
+      if (canvas) {
+        drawFrame(frameRef.current);
+      }
+    }).catch(() => {
+      dispatch(setIsLoaded(false));
+      dispatch(setIsError(true));
     });
-
-    images.forEach((img, idx) => {
-      img.onload = () => {
-        loadedCount += 1;
-        if (loadedCount === sheets.length && !hasError) {
-          imagesRef.current = images;
-          dispatch(setIsLoaded(true));
-
-          // Size canvas from the first sheet's frame dimensions
-          const canvas = canvasRef.current;
-          if (canvas) {
-            drawFrame(frameRef.current);
-          }
-        }
-      };
-
-      img.onerror = () => {
-        hasError = true;
-        setIsLoaded(false);
-        dispatch(setIsError(true));
-      };
-
-      img.src = sheets[idx].src;
-    });
-  }, [sheets, drawFrame, displayWidth, displayHeight, dispatch]);
+  }, [sheets, drawFrame, dispatch]);
 
   const togglePlay = () => {
       dispatch(setIsPlaying(!isPlaying));
