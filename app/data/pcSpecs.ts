@@ -24,7 +24,7 @@ const pcSpecs: SpecItem[] = [
   { key: "motherboard", label: "Материнская плата: ASUS PRIME X670E-PRO WIFI", icon: Network, endAnimationPath: "/animations/sprite_get_motherboard_8x6.webp" },
   { key: "psu", label: "БП: ZALMAN TeraMax II 1200W WHITE [ZM1200-TMX2 WH]", icon: Zap, endAnimationPath: "/animations/sprite_get_psu_8x6.webp"  },
   { key: "cooling", label: "Водяное охлаждение: DEEPCOOL LS520 WH", icon: Fan, endAnimationPath: "/animations/sprite_get_cooler_8x6.webp" },
-  { key: "case", label: "Корпус: MONTECH SKY TWO [SKY TWO White]", icon: Box },
+  { key: "case", label: "Корпус: MONTECH SKY TWO [SKY TWO White]", icon: Box, endAnimationPath: "/animations/sprite_get_box_8x6.webp" },
   { key: "monitor", label: "Монитор: Xiaomi Mi 2K Gaming 165 Гц", icon: Monitor },
   { key: "microphone", label: "Микрофон: Audio-Technica AT2020USB+", icon: Mic },
 ];
