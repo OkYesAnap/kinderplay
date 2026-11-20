@@ -214,17 +214,18 @@ export default function SpriteAnimation({
       return waitForPreload();
     }).then(() => {
       dispatch(setIsLoaded(true));
-
-      // Draw the initial frame
-      const canvas = canvasRef.current;
-      if (canvas) {
-        drawFrame(frameRef.current);
-      }
     }).catch(() => {
       dispatch(setIsLoaded(false));
       dispatch(setIsError(true));
     });
-  }, [sheets, drawFrame, dispatch]);
+  }, [sheets, dispatch]);
+
+  // Draw the first frame once loading completes and the canvas DOM is ready
+  useEffect(() => {
+    if (!isLoaded) return;
+    drawFrame(0);
+    frameRef.current = 0;
+  }, [isLoaded, drawFrame]);
 
   const togglePlay = () => {
       dispatch(setIsPlaying(!isPlaying));
