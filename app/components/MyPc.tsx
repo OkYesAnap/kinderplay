@@ -53,7 +53,11 @@ export default function MyPc() {
                   }
                 }}
                   key={i}
-                  className="flex items-start gap-4 p-3 rounded-xl bg-white/5 hover:bg-white/10 transition-colors cursor-pointer"
+                    className={`flex items-start gap-4 p-3 rounded-xl transition-colors cursor-pointer ${
+                        clicked === i
+                            ? "bg-cyan-700 text-cyan-100"
+                            : "bg-white/5 hover:bg-white/10"
+                    }`}
                 >
                   <span className="text-2xl shrink-0 mt-0.5 text-white">
                     <spec.icon className="w-6 h-6" />
