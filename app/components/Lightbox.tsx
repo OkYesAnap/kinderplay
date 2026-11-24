@@ -34,7 +34,7 @@ export default function Lightbox({ image, onClose }: LightboxProps) {
       />
 
       {/* Image container — scales up */}
-      <div className="relative z-10 animate-scale-in w-full">
+      <div className="relative z-10 animate-scale-in w-full h-[90vh]">
         {/* Close button */}
         <button
           onClick={onClose}
