@@ -2,6 +2,7 @@
 
 import pcSpecs from "../data/pcSpecs"
 import SpriteAnimation from "./SpriteAnimation"
+import SpecLink from "./SpecLink"
 import {useDispatch, useSelector} from "react-redux";
 import {
   selectDirection,
@@ -11,10 +12,16 @@ import {
 import {useState} from "react";
 import {reverseDirection} from "@/app/utils/reverseDirection";
 
+interface SpecLink {
+  label: string,
+  link: string
+}
+
 export default function MyPc() {
   const dispatch = useDispatch();
   const direction = useSelector(selectDirection);
   const [clicked, setClicked] = useState<number>(-1);
+  const [specLincInfo, setSpecLincInfo] = useState<SpecLink | null>(null);
 
   return (
     <section
@@ -44,11 +51,12 @@ export default function MyPc() {
                   if (clicked === i) {
                     dispatch(setAnimationParams({src: "/animations/sprite_open_box_8x6.webp", direction: reverseDirection(direction)}));
                     dispatch(setIsPlaying(true));
+                    setSpecLincInfo(null);
                     setClicked(-1);
                   } else {
-                    dispatch(setAnimationParams(
-                        {src: spec.endAnimationPath || '', direction: direction}));
+                    dispatch(setAnimationParams({src: spec.endAnimationPath || '', direction: direction}));
                     dispatch(setIsPlaying(true));
+                    setSpecLincInfo({label: spec.label, link: spec.link})
                     setClicked(i);
                   }
                 }}
@@ -71,7 +79,12 @@ export default function MyPc() {
           </div>
 
           {/* Right: Sprite Animation */}
-          <div className="flex items-center justify-center">
+          <div className="relative flex flex-col items-center justify-center">
+            {specLincInfo && (
+              <div className="absolute top-0 left-0 right-0 z-20">
+                <SpecLink {...{...specLincInfo}}/>
+              </div>
+            )}
             <SpriteAnimation
               // src={endAnimationPath ? ["/animations/sprite_open_box_8x6.webp", endAnimationPath] : ["/animations/sprite_open_box_8x6.webp"]}
               cols={8}

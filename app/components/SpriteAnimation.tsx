@@ -225,15 +225,7 @@ export default function SpriteAnimation({
     if (!isLoaded) return;
     drawFrame(0);
     frameRef.current = 0;
-  }, [isLoaded, drawFrame]);
-
-  const togglePlay = () => {
-      dispatch(setIsPlaying(!isPlaying));
-  };
-
-  const toggleDirection = () => {
-    dispatch(setDirection(direction === "forward" ? "reverse" : "forward"));
-  };
+  }, [isLoaded, drawFrame]);;
 
   if (isError) {
     return (
@@ -298,76 +290,6 @@ export default function SpriteAnimation({
           height: displayHeight,
         }}
       />
-
-      {/* Controls */}
-      <div className="flex items-center gap-2">
-        {/* Play / Pause button */}
-        <button
-          onClick={togglePlay}
-          className="flex items-center gap-1 rounded-lg bg-gray-800 px-3 py-1.5 text-sm font-medium text-white transition hover:bg-gray-700"
-          aria-label={isPlaying ? "Pause" : "Play"}
-        >
-          {isPlaying ? (
-            <>
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-                fill="currentColor"
-                className="h-4 w-4"
-              >
-                <rect x="6" y="4" width="4" height="16" rx="1" />
-                <rect x="14" y="4" width="4" height="16" rx="1" />
-              </svg>
-              Pause
-            </>
-          ) : (
-            <>
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-                fill="currentColor"
-                className="h-4 w-4"
-              >
-                <path d="M8 5.14v13.72a1 1 0 0 0 1.5.86l11-6.86a1 1 0 0 0 0-1.72l-11-6.86A1 1 0 0 0 8 5.14Z" />
-              </svg>
-              Play
-            </>
-          )}
-        </button>
-
-        {/* Direction toggle button */}
-        <button
-          onClick={toggleDirection}
-          className="flex items-center gap-1 rounded-lg bg-gray-800 px-3 py-1.5 text-sm font-medium text-white transition hover:bg-gray-700"
-          aria-label={`Switch to ${direction === "forward" ? "reverse" : "forward"}`}
-        >
-          {direction === "forward" ? (
-            <>
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-                fill="currentColor"
-                className="h-4 w-4"
-              >
-                <path d="M5.055 5.055A1 1 0 0 1 6 4h12a1 1 0 0 1 1 1v4a1 1 0 0 1-2 0V6H9v10h10a1 1 0 0 1 0 2H9a1 1 0 0 1-.777-.342l-4-4a1 1 0 0 1 0-1.316l4-4A1 1 0 0 1 9 7V6a1 1 0 0 1-1-1z" />
-              </svg>
-              Reverse
-            </>
-          ) : (
-            <>
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-                fill="currentColor"
-                className="h-4 w-4"
-              >
-                <path d="M18.945 5.055A1 1 0 0 0 18 4H6a1 1 0 0 0-1 1v4a1 1 0 1 0 2 0V6h10v10H8a1 1 0 1 0 0 2h10a1 1 0 0 0 .777-.342l4-4a1 1 0 0 0 0-1.316l-4-4z" />
-              </svg>
-              Forward
-            </>
-          )}
-        </button>
-      </div>
     </div>
   );
 }

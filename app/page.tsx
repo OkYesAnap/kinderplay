@@ -6,27 +6,27 @@ import MyPc from "./components/MyPc";
 const sections = [
   {
     id: "wishes",
-    label: "Письмо деду морозу",
+    label: "",
     icon: "🎂",
     bg: "/images/wishes-bg.jpg",
     gradient: "from-pink-500/60 to-purple-500/60",
     cards: [
-      { title: "Birthday Wishes", description: "Celebrate every special day with joy!", image: "/images/wishes-bg.jpg", targetAmount: 250000, currentAmount: 13233 },
+      { title: "Birthday Wishes", description: "Мини отдых", image: "/images/wishes-bg.jpg", targetAmount: 10000, currentAmount: 3333 },
     ],
   },
-  {
-    id: "games",
-    label: "Games",
-    icon: "🎮",
-    bg: "/images/games-bg.jpg",
-    gradient: "from-green-500/60 to-blue-500/60",
-    cards: [
-      { title: "Memory Match", description: "Test your memory with fun cards!", image: "/images/games-bg.jpg", targetAmount: 1000, currentAmount: 1000 },
-      { title: "Puzzle Quest", description: "Solve puzzles and collect stars.", image: "/images/games-bg.jpg", targetAmount: 2000, currentAmount: 1500 },
-      { title: "Coloring Book", description: "Unleash your creativity with colors.", image: "/images/games-bg.jpg", targetAmount: 600, currentAmount: 450 },
-      { title: "Word Search", description: "Find hidden words in the grid.", image: "/images/games-bg.jpg", targetAmount: 800, currentAmount: 200 },
-    ],
-  },
+  // {
+  //   id: "games",
+  //   label: "Games",
+  //   icon: "🎮",
+  //   bg: "/images/games-bg.jpg",
+  //   gradient: "from-green-500/60 to-blue-500/60",
+  //   cards: [
+  //     { title: "Memory Match", description: "Test your memory with fun cards!", image: "/images/games-bg.jpg", targetAmount: 1000, currentAmount: 1000 },
+  //     { title: "Puzzle Quest", description: "Solve puzzles and collect stars.", image: "/images/games-bg.jpg", targetAmount: 2000, currentAmount: 1500 },
+  //     { title: "Coloring Book", description: "Unleash your creativity with colors.", image: "/images/games-bg.jpg", targetAmount: 600, currentAmount: 450 },
+  //     { title: "Word Search", description: "Find hidden words in the grid.", image: "/images/games-bg.jpg", targetAmount: 800, currentAmount: 200 },
+  //   ],
+  // },
   // {
   //   id: "movies",
   //   label: "Movies",
