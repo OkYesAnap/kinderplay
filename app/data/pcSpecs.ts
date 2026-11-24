@@ -25,8 +25,8 @@ const pcSpecs: SpecItem[] = [
   { key: "psu", label: "БП: ZALMAN TeraMax II 1200W WHITE [ZM1200-TMX2 WH]", icon: Zap, endAnimationPath: "/animations/sprite_get_psu_8x6.webp"  },
   { key: "cooling", label: "Водяное охлаждение: DEEPCOOL LS520 WH", icon: Fan, endAnimationPath: "/animations/sprite_get_cooler_8x6.webp" },
   { key: "case", label: "Корпус: MONTECH SKY TWO [SKY TWO White]", icon: Box, endAnimationPath: "/animations/sprite_get_box_8x6.webp" },
-  { key: "monitor", label: "Монитор: Xiaomi Mi 2K Gaming 165 Гц", icon: Monitor },
-  { key: "microphone", label: "Микрофон: Audio-Technica AT2020USB+", icon: Mic },
+  { key: "monitor", label: "Монитор: Xiaomi Mi 2K Gaming 165 Гц", icon: Monitor, endAnimationPath: "/animations/sprite_get_monitor_8x6.webp" },
+  { key: "microphone", label: "Микрофон: Audio-Technica AT2020USB+", icon: Mic, endAnimationPath: "/animations/sprite_get_mic_8x6.webp" },
 ];
 
 export default pcSpecs;
