@@ -1,14 +1,11 @@
 import Nav from "./components/Nav";
-import Home from "./components/Home";
 import Section from "./components/Section";
-import MyPc from "./components/MyPc";
 import {sections} from "@/app/data/sections";
 
 export default function Page() {
     return (
         <main className="scroll-snap-y scroll-snap-mandatory overflow-y-auto">
             <Nav/>
-            <Home/>
             {sections.map((section) => {
                 if(section.content) {
                     const CustomSection = section.content;
@@ -25,8 +22,6 @@ export default function Page() {
                     />)
                 }
             })}
-            <MyPc/>
-
             <footer className="bg-gray-900 text-gray-400 text-center py-8 text-sm snap-start">
                 <p>&copy; 2026 KinderPlay. All rights reserved.</p>
             </footer>
