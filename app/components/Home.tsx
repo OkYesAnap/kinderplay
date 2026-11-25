@@ -11,7 +11,7 @@ export default function Home() {
       }}
     >
       {/* overlay gradient */}
-      <div className="absolute inset-0 bg-gradient-to-br from-purple-500/60 to-pink-500/60" />
+        <div className="absolute inset-0 bg-gradient-to-tl from-emerald-500/60 to-teal-400/60" />
 
       <div className="relative z-10 text-center px-6 max-w-3xl">
         {/* Branding */}
