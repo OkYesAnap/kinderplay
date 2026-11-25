@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import {useEffect, useRef, useState} from "react";
 import Nav from "./components/Nav";
 import Section from "./components/Section";
 import {sections} from "@/app/data/sections";
@@ -9,6 +9,7 @@ const sectionIds = sections.map((s) => s.id);
 
 export default function Page() {
     const mainRef = useRef<HTMLElement>(null);
+    const debounceTimerRef = useRef<ReturnType<typeof setTimeout>>(null);
     const [currentHash, setCurrentHash] = useState<string>(() =>
         typeof window !== "undefined" ? window.location.hash.replace("#", "") : ""
     );
@@ -19,12 +20,10 @@ export default function Page() {
         };
         window.addEventListener("hashchange", handleHashChange);
 
-        let debounceTimer: ReturnType<typeof setTimeout>;
-
         const handleWheel = (e: WheelEvent) => {
             e.preventDefault();
 
-            if (debounceTimer) return;
+            if (debounceTimerRef.current) return;
 
             const currentIndex = sectionIds.indexOf(currentHash);
             const direction = e.deltaY > 0 ? 1 : -1;
@@ -34,13 +33,12 @@ export default function Page() {
             if (nextIndex < 0) nextIndex = sectionIds.length - 1;
             if (nextIndex >= sectionIds.length) nextIndex = 0;
 
-            const nextId = sectionIds[nextIndex];
-            window.location.hash = nextId;
+            window.location.hash = sectionIds[nextIndex];
 
             // Debounce: ignore further wheel events for 300ms
-            debounceTimer = setTimeout(() => {
-                debounceTimer = undefined as unknown as ReturnType<typeof setTimeout>;
-            }, 300);
+            debounceTimerRef.current = setTimeout(() => {
+                debounceTimerRef.current = undefined as unknown as ReturnType<typeof setTimeout>;
+            }, 100);
         };
 
         const mainEl = mainRef.current;
@@ -49,7 +47,7 @@ export default function Page() {
         return () => {
             window.removeEventListener("hashchange", handleHashChange);
             mainEl?.removeEventListener("wheel", handleWheel);
-            if (debounceTimer) clearTimeout(debounceTimer);
+            if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current);
         };
     }, [currentHash]);
 
