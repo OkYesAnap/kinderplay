@@ -47,7 +47,6 @@ export default function Page() {
         return () => {
             window.removeEventListener("hashchange", handleHashChange);
             mainEl?.removeEventListener("wheel", handleWheel);
-            if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current);
         };
     }, [currentHash]);
 
