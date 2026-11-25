@@ -5,10 +5,10 @@ export const sections = [
     { id: "home", label: "Главная", icon: "🏠", content: Home },
     {
         id: "wishes",
-        label: "Мини отдых",
+        label: "Поддержка",
         icon: "🎂",
         bg: "/images/wishes-bg.jpg",
-        gradient: "from-pink-500/60 to-purple-500/60",
+        gradient: "from-blue-500/60 to-purple-500/60",
         cards: [
             { title: "Birthday Wishes", description: "Мини отдых", image: "/images/wishes-bg.jpg", targetAmount: 10000, currentAmount: 3333 },
         ],
