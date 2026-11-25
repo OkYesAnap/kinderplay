@@ -2,14 +2,7 @@
 
 import LoginButton from "@/app/components/LoginButton";
 import {useAuth} from "@/app/components/AuthProvider";
-
-const sections = [
-  { id: "home", label: "Главная", icon: "🏠" },
-  { id: "wishes", label: "Мини отдых", icon: "🎂" },
-  // { id: "games", label: "Games", icon: "🎮" },
-  // { id: "movies", label: "Movies", icon: "🎬" },
-  { id: "mypc", label: "Мой ПК", icon: "💻" },
-];
+import {sections} from "@/app/data/sections";
 
 export default function Nav() {
   useAuth();
