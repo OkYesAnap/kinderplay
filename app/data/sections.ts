@@ -1,5 +1,8 @@
+import Home from "@/app/components/Home";
+import MyPc from "@/app/components/MyPc";
+
 export const sections = [
-    { id: "home", label: "Главная", icon: "🏠" },
+    { id: "home", label: "Главная", icon: "🏠", content: Home },
     {
         id: "wishes",
         label: "Мини отдых",
@@ -12,6 +15,6 @@ export const sections = [
     },
     // { id: "games", label: "Games", icon: "🎮" },
     // { id: "movies", label: "Movies", icon: "🎬" },
-    { id: "mypc", label: "Мой ПК", icon: "💻" },
+    { id: "mypc", label: "Мой ПК", icon: "💻", content: MyPc },
 
 ];
